@@ -7,6 +7,7 @@ using api.DTO;
 using api.DTO.Comment;
 using api.Interfaces;
 using api.Mappers;
+using api.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.controllers
@@ -16,10 +17,12 @@ namespace api.controllers
     public class CommController: ControllerBase
     {
         private readonly ICommRepo _commRepo;
+        private readonly IStockRepo _istockRepo;
 
-        public CommController(ICommRepo commRepo)
+        public CommController(ICommRepo commRepo, IStockRepo istockRepo)
         {
             _commRepo = commRepo;
+            _istockRepo = istockRepo;
         }
 
         [HttpGet]
@@ -48,9 +51,33 @@ namespace api.controllers
         [HttpPost("{stockId}")]
         public async Task<IActionResult> Create([FromRoute] int stockId , CreateCommDto createCom)
         {
-            
+            if(!await _istockRepo.StockExists(stockId))
+            {
+                return BadRequest("Stock doesnt exsit");
+            }
+
+            var comMod = createCom.ToCommFromCreate(stockId);
+            await _commRepo.CreateAsync(comMod);
+
+            return CreatedAtAction(nameof(GetByID), new {id= comMod}, comMod.ToCommDto());
+
         }
 
+        [HttpDelete]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            
+            var comMod = await _commRepo.DeleteAsync(id);
+
+            if(comMod == null)
+            {
+                return NotFound("Comment doest not exist");
+            }
+
+            return Ok(comMod);
+
+        }
 
 
 

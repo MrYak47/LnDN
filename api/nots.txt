@@ -1,0 +1,1 @@
+// "DefaultConnection":"Server=localhost\\SQLEXPRESS;Trusted_ConnectDatabase=master;ion=True;Initial Catalog=Studioapi;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"    
