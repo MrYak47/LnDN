@@ -29,15 +29,22 @@ namespace api.controllers
 
         public async Task<IActionResult> GetAll()
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            
             var comments = await _commRepo.GetAllAysnc();
             var commDto = comments.Select(s => s.ToCommDto());
             
             return Ok(commDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetByID([FromRoute] int id)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comment = await _commRepo.GetByIdAsync(id);
 
             if (comment == null)
@@ -48,9 +55,12 @@ namespace api.controllers
             return Ok(comment.ToCommDto());
         }
         
-        [HttpPost("{stockId}")]
+        [HttpPost("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId , CreateCommDto createCom)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if(!await _istockRepo.StockExists(stockId))
             {
                 return BadRequest("Stock doesnt exsit");
@@ -59,7 +69,7 @@ namespace api.controllers
             var comMod = createCom.ToCommFromCreate(stockId);
             await _commRepo.CreateAsync(comMod);
 
-            return CreatedAtAction(nameof(GetByID), new {id= comMod}, comMod.ToCommDto());
+            return CreatedAtAction(nameof(GetByID), new {id= comMod.Id}, comMod.ToCommDto());
 
         }
 
@@ -67,7 +77,9 @@ namespace api.controllers
         [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comMod = await _commRepo.DeleteAsync(id);
 
             if(comMod == null)
@@ -76,6 +88,24 @@ namespace api.controllers
             }
 
             return Ok(comMod);
+
+        }
+
+        [HttpPut]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommReqDto updateDto)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var comment = await _commRepo.UpdateAsync(id, updateDto.ToCommFromUpdate());
+
+            if(comment == null)
+            {
+                return NotFound("Comment not Found");
+            }
+
+            return Ok(comment.ToCommDto());
 
         }
 

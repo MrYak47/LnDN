@@ -34,5 +34,16 @@ namespace api.Mappers
 
             };
         }
+
+         public static Comment ToCommFromUpdate(this UpdateCommReqDto UpComm)
+        {
+            return new Comment
+            {
+
+                Title = UpComm.Title,
+                Content = UpComm.Content,
+
+            };
+        }
     }
 }

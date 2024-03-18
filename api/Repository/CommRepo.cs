@@ -38,11 +38,6 @@ namespace api.Repository
             await _context.SaveChangesAsync();
             return comMod;
 
-
-
-
-
-
         }
 
         public async Task<List<Comment>> GetAllAysnc()
@@ -56,12 +51,30 @@ namespace api.Repository
 
         }
 
+        public async Task<Comment?> UpdateAsync(int id, Comment ComMod)
+        {
+            var exCom = await _context.Comments.FindAsync(id);
+
+            if (exCom == null)
+            {
+                return null;
+            }
+
+            exCom.Title = ComMod.Title;
+            exCom.Content =ComMod.Content;
+            
+            await _context.SaveChangesAsync();
+
+            return ComMod;
+
+        }
+
         // public Task<Comment?> GetByIdAsync(int id)
         // {
         //     throw new NotImplementedException();
         // }
 
-       
-    
+
+
     }
 }
